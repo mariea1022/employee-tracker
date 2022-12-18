@@ -5,9 +5,9 @@ const mysql = require("mysql2");
 // to connect to the database
 const dbConnection = mysql.createConnection(
     {
-        host: "localhost",
+        host: "127.0.0.1",
         user: "root",
-        password: "password",
+        password: "",
         database: "employee_db",
     },
     console.log(`Connected to the employee_db database.`)
@@ -82,13 +82,14 @@ let employees = [];
 // function to initialize inquirer app
 function init() {
     inquirer.prompt(mainMenuQuestions).then((answers) => {
-    if (answers.action === "view all departments") {
+    if (answers.action == "view all departments") {
+        console.log(answers.action)
         viewDepartments()
     }
-    else if (answers.action === "view all roles") {
+    else if (answers.action == "view all roles") {
         viewRoles()
     }
-    else if (answers.action === "view all employees") {
+    else if (answers.action == "view all employees") {
         viewEmployees()
     }
     // else if (answers.action = "add a department") {
@@ -112,15 +113,23 @@ function init() {
 function viewDepartments() {
     let query = `SELECT * 
                 FROM department`
-    dbConnection.query(query, function (err, results) {
+    dbConnection.query(query, (err, results) => {
+        if (err) {
+            console.log(err)
+        }
         console.log(results)
+    
+    dbConnection.end();
 })}
 
 function viewRoles() {
     let query = `SELECT role.title, role.id, role.salary
                 FROM role 
                 JOIN department ON role.department_id = department.id`
-    dbConnection.query(query, function (err, results) {
+    dbConnection.query(query, (err, results) => {
+        if (err) {
+            console.log(err)
+        }
         console.log(results)
 })}
 
@@ -129,11 +138,15 @@ function viewEmployees() {
                 FROM employee LEFT JOIN role ON role.id = employee.role_id 
                 LEFT JOIN department ON department.id = role.department_id 
                 LEFT OUTER JOIN employee m ON employee.manager_id = m.id;`
-    dbConnection.query(query, function (err, results) {
+    dbConnection.query(query, (err, results) => {
+        if (err) {
+            console.log(err)
+        }
         console.log(results)
 })}
-    
-dbConnection.end();
+
+// when inquirer questions are done, end the connection
+
 
 
 // function addRole() {
@@ -151,7 +164,5 @@ init();
 //     dbConnection.query("SELECT * FROM department", function (err, results) {
 //     console.log(results);
 // })};
-
-// when inquirer questions are done, end the connection
 
 
