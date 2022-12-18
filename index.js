@@ -2,6 +2,17 @@ const inquirer = require("inquirer");
 const fs = require("fs");
 const mysql = require("mysql2");
 
+// to connect to the database
+const dbConnection = mysql.createConnection(
+    {
+        host: "localhost",
+        user: "root",
+        password: "password",
+        database: "employee_db",
+    },
+    console.log(`Connected to the employee_db database.`)
+);
+
 const mainMenuQuestions = [
     {
         type: "list",
@@ -16,7 +27,7 @@ const departmentQuestions = [
     {
         type: "input",
         message: "What is the name of the department?",
-        name: departmenName
+        name: "departmentName"
     }
 ];
 
@@ -24,18 +35,18 @@ const roleQuestions = [
     {
         type: "input",
         message: "What is the name of the role?",
-        name: roleName
+        name: "roleTitle"
     },
     {
         type: "number",
         message: "What is the salary of the role?",
-        name: roleSalary
+        name: "roleSalary"
     },
     {
         type: "list",
         message: "Which department does this role belong to?",
         choices: [],
-        name: roleDepartment
+        name: "roleDepartment"
     }
 ];
 
@@ -43,58 +54,104 @@ const employeeQuestions = [
     {
         type: "input",
         message: "What is the employee's first name?",
-        name: employeeFirstName
+        name: "employeeFirstName"
     },
     {
         type: "input",
         message: "What is the employee's last name?",
-        name: employeeLastName
+        name: "employeeLastName"
     },
     {
         type: "list",
         message: "What is the employee's role?",
         choices: [],
-        name: employeeRole
+        name: "employeeRole"
     },
     {
         type: "list",
         message: "Who is the employee's manager?",
         choices: [],
-        name: employeeManager
+        name: "employeeManager"
     }
 ];
 
-// function to initialize app
+let departments = [];
+let roles = [];
+let employees = [];
+
+// function to initialize inquirer app
 function init() {
     inquirer.prompt(mainMenuQuestions).then((answers) => {
-     
+    if (answers.action === "view all departments") {
+        viewDepartments()
     }
-    )
+    else if (answers.action === "view all roles") {
+        viewRoles()
+    }
+    else if (answers.action === "view all employees") {
+        viewEmployees()
+    }
+    // else if (answers.action = "add a department") {
+    //     addDepartment()
+    //     // let department = new Department(answers.departmentName);
+    //     // departments.push(department)
+    // }
+    // else if (answers.action = "add a role") {
+    //     addRole()
+    //     // let role = new Role (answers.roleTitle, answers.roleSalary, answers.roleDepartment);
+    //     // roles.push(roles)
+    // }
+    // else if (answers.action = "add an employee") {
+    //     addEmployee()
+    //     // let employees = new Employee (answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager);
+    //     // employees.push(employee)
+    // }
+    })
 }
   
-function mainQuestions() {
+function viewDepartments() {
+    let query = `SELECT * 
+                FROM department`
+    dbConnection.query(query, function (err, results) {
+        console.log(results)
+})}
 
-}
+function viewRoles() {
+    let query = `SELECT role.title, role.id, role.salary
+                FROM role 
+                JOIN department ON role.department_id = department.id`
+    dbConnection.query(query, function (err, results) {
+        console.log(results)
+})}
+
+function viewEmployees() {
+    let query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, m.first_name as 'manager_first_name', m.last_name as 'manager_last_name' 
+                FROM employee LEFT JOIN role ON role.id = employee.role_id 
+                LEFT JOIN department ON department.id = role.department_id 
+                LEFT OUTER JOIN employee m ON employee.manager_id = m.id;`
+    dbConnection.query(query, function (err, results) {
+        console.log(results)
+})}
+    
+dbConnection.end();
+
+
+// function addRole() {
+//     inquirer.prompt(roleQuestions).then(answers => {
+//         dbConnection.query(`INSERT INTO role (title, salary, department_id)
+//         VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${answers.roleDepartment})`, function (err, results) {
+//             console.log(results)
+//         })
+//     }) 
+// }
 
 init();
 
-// to connect to the database
-const dbConnection = mysql.createConnection(
-    {
-        host: "localhost",
-        user: "root",
-        password: "",
-        database: "employee_db",
-    },
-    console.log(`Connected to the employee_db database.`)
-);
+// function viewDepartments() {
+//     dbConnection.query("SELECT * FROM department", function (err, results) {
+//     console.log(results);
+// })};
 
-// querries to the database using the dbConnection
-// should have a query to view all departments, all roles, all employees?
-dbConnection.query("SELECT * FROM department", function (err, results) {
-    console.log(results);
+// when inquirer questions are done, end the connection
 
-    // when inquirer questions are done, end the connection
-    dbConnection.end();
-});
 
