@@ -18,7 +18,7 @@ const mainMenuQuestions = [
         type: "list",
         message: "What do you want to do?",
         choices: ["view all departments", "view all roles", "view all employees",
-        "add a department", "add a role", "add an employee", "update an employee role"],
+        "add a department", "add a role", "add an employee", "update an employee role", "I'm done"],
         name: "action"
     }
 ];
@@ -30,6 +30,16 @@ const departmentQuestions = [
         name: "departmentName"
     }
 ];
+
+let query = `SELECT name
+FROM department`
+dbConnection.query(query, (err, results) => {
+if (err) {
+console.log(err)
+}
+console.log(results)
+// init()
+})
 
 const roleQuestions = [
     {
@@ -83,7 +93,6 @@ let employees = [];
 function init() {
     inquirer.prompt(mainMenuQuestions).then((answers) => {
     if (answers.action == "view all departments") {
-        console.log(answers.action)
         viewDepartments()
     }
     else if (answers.action == "view all roles") {
@@ -97,16 +106,20 @@ function init() {
     //     // let department = new Department(answers.departmentName);
     //     // departments.push(department)
     // }
-    // else if (answers.action = "add a role") {
-    //     addRole()
+    else if (answers.action = "add a role") {
+        addRole()
     //     // let role = new Role (answers.roleTitle, answers.roleSalary, answers.roleDepartment);
     //     // roles.push(roles)
-    // }
+    }
     // else if (answers.action = "add an employee") {
     //     addEmployee()
     //     // let employees = new Employee (answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager);
     //     // employees.push(employee)
     // }
+    // if user selects I'm done, end the connection
+    else if (answers.action = "I'm done") {
+        dbConnection.end();
+    }
     })
 }
   
@@ -117,9 +130,8 @@ function viewDepartments() {
         if (err) {
             console.log(err)
         }
-        console.log(results)
-    
-    dbConnection.end();
+        console.table(results)
+        init()
 })}
 
 function viewRoles() {
@@ -130,7 +142,8 @@ function viewRoles() {
         if (err) {
             console.log(err)
         }
-        console.log(results)
+        console.table(results)
+        init()
 })}
 
 function viewEmployees() {
@@ -142,27 +155,19 @@ function viewEmployees() {
         if (err) {
             console.log(err)
         }
-        console.log(results)
+        console.table(results)
+        init()
 })}
 
-// when inquirer questions are done, end the connection
-
-
-
-// function addRole() {
-//     inquirer.prompt(roleQuestions).then(answers => {
-//         dbConnection.query(`INSERT INTO role (title, salary, department_id)
-//         VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${answers.roleDepartment})`, function (err, results) {
-//             console.log(results)
-//         })
-//     }) 
-// }
+function addRole() {
+    inquirer.prompt(roleQuestions).then(answers => {
+        dbConnection.query(`INSERT INTO role (title, salary, department_id)
+        VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${answers.roleDepartment})`, function (err, results) {
+            console.log(results)
+        })
+    }) 
+}
 
 init();
-
-// function viewDepartments() {
-//     dbConnection.query("SELECT * FROM department", function (err, results) {
-//     console.log(results);
-// })};
 
 
