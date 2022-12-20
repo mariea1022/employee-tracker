@@ -31,16 +31,6 @@ const departmentQuestions = [
     }
 ];
 
-let query = `SELECT name
-FROM department`
-dbConnection.query(query, (err, results) => {
-if (err) {
-console.log(err)
-}
-console.log(results)
-// init()
-})
-
 const roleQuestions = [
     {
         type: "input",
@@ -55,6 +45,7 @@ const roleQuestions = [
     {
         type: "list",
         message: "Which department does this role belong to?",
+        // name value pair
         choices: [],
         name: "roleDepartment"
     }
@@ -85,10 +76,6 @@ const employeeQuestions = [
     }
 ];
 
-let departments = [];
-let roles = [];
-let employees = [];
-
 // function to initialize inquirer app
 function init() {
     inquirer.prompt(mainMenuQuestions).then((answers) => {
@@ -101,21 +88,21 @@ function init() {
     else if (answers.action == "view all employees") {
         viewEmployees()
     }
-    // else if (answers.action = "add a department") {
-    //     addDepartment()
+    else if (answers.action = "add a department") {
+        // addDepartment()
     //     // let department = new Department(answers.departmentName);
     //     // departments.push(department)
-    // }
-    else if (answers.action = "add a role") {
+    }
+    if (answers.action = "add a role") {
         addRole()
     //     // let role = new Role (answers.roleTitle, answers.roleSalary, answers.roleDepartment);
     //     // roles.push(roles)
     }
-    // else if (answers.action = "add an employee") {
-    //     addEmployee()
+    else if (answers.action = "add an employee") {
+        // addEmployee()
     //     // let employees = new Employee (answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager);
     //     // employees.push(employee)
-    // }
+    }
     // if user selects I'm done, end the connection
     else if (answers.action = "I'm done") {
         dbConnection.end();
@@ -124,13 +111,13 @@ function init() {
 }
   
 function viewDepartments() {
-    let query = `SELECT * 
+    let query = `SELECT *
                 FROM department`
     dbConnection.query(query, (err, results) => {
         if (err) {
             console.log(err)
         }
-        console.table(results)
+        console.log(results)
         init()
 })}
 
@@ -142,7 +129,7 @@ function viewRoles() {
         if (err) {
             console.log(err)
         }
-        console.table(results)
+        console.log(results)
         init()
 })}
 
@@ -155,17 +142,44 @@ function viewEmployees() {
         if (err) {
             console.log(err)
         }
-        console.table(results)
+        console.log(results)
         init()
 })}
 
+function viewDepartmentNames() {
+    let depts = ""
+    let query = `SELECT * FROM department`
+    dbConnection.query(query, (err, results) => {
+if (err) {
+    console.log(err)
+}
+console.log(results)
+depts = results
+// console.log(departmentNamesArray)
+// return departmentNamesArray
+})
+return depts
+}
+
 function addRole() {
-    inquirer.prompt(roleQuestions).then(answers => {
-        dbConnection.query(`INSERT INTO role (title, salary, department_id)
-        VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${answers.roleDepartment})`, function (err, results) {
-            console.log(results)
+    viewDepartmentNames().then(answers => {
+        console.log(answers)
+        let departmentList = answers.map((forEachItem) => ({
+            name: forEachItem.name,
+            value: forEachItem.id
         })
-    }) 
+        )
+        console.log(departmentList)
+    }).then(answers => {
+        inquirer.prompt(roleQuestions).then(answers => {
+        
+            dbConnection.query(`INSERT INTO role (title, salary, department_id)
+            VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${departmentNamesArray})`, function (err, results) {
+                console.log(results)
+            })
+        }) 
+    })
+   
 }
 
 init();
