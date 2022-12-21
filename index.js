@@ -31,56 +31,39 @@ const inquirerMainMenuQuestions = [
   },
 ];
 
-const departmentQuestions = [
-  {
-    type: "input",
-    message: "What is the name of the department?",
-    name: "departmentName",
-  },
-];
+// function departmentQuestions() {
+  const inquirerDepartmentQuestions = [
+    {
+      type: "input",
+      message: "What is the name of the department?",
+      name: "name",
+    },
+  ];
+//   return inquirerDepartmentQuestions;
+// }
 
 function roleQuestions(choicesArray) {
   const inquirerRoleQuestions = [
     {
       type: "input",
       message: "What is the name of the role?",
-      name: "roleTitle",
+      name: "title",
     },
     {
       type: "number",
       message: "What is the salary of the role?",
-      name: "roleSalary",
+      name: "salary",
     },
     {
       type: "list",
       message: "Which department does this role belong to?",
       // name value pair
       choices: choicesArray,
-      name: "roleDepartment",
+      name: "department_id",
     },
   ];
   return inquirerRoleQuestions;
 }
-
-// const roleQuestions = [
-//     {
-//         type: "input",
-//         message: "What is the name of the role?",
-//         name: "roleTitle"
-//     },
-//     {
-//         type: "number",
-//         message: "What is the salary of the role?",
-//         name: "roleSalary"
-//     },
-//     {
-//         type: "list",
-//         message: "Which department does this role belong to?",
-//         // name value pair
-//         choices: [],
-//         name: "roleDepartment"
-//     }
-// ];
 
 const employeeQuestions = [
   {
@@ -116,22 +99,14 @@ function init() {
       viewRoles();
     } else if (answers.action == "view all employees") {
       viewEmployees();
-    } else if ((answers.action = "add a department")) {
-      // addDepartment()
-      //     // let department = new Department(answers.departmentName);
-      //     // departments.push(department)
-    }
-    if ((answers.action = "add a role")) {
+    } else if (answers.action = "add a department") {
+      addDepartment();
+    } else if (answers.action == "add a role") {
       addRole();
-      //     // let role = new Role (answers.roleTitle, answers.roleSalary, answers.roleDepartment);
-      //     // roles.push(roles)
-    } else if ((answers.action = "add an employee")) {
-      // addEmployee()
-      //     // let employees = new Employee (answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager);
-      //     // employees.push(employee)
-    }
-    // if user selects I'm done, end the connection
-    else if ((answers.action = "I'm done")) {
+    } else if (answers.action == "add an employee") {
+    //   addEmployee();
+    } // if user selects I'm done, end the connection
+    else if (answers.action == "I'm done") {
       dbConnection.end();
     }
   });
@@ -191,6 +166,22 @@ function viewEmployees() {
 // return depts
 // }
 
+function addDepartment() {
+  inquirer.prompt(inquirerDepartmentQuestions).then((answers) => {
+    dbConnection.query(
+      `INSERT INTO department SET ?`,
+      answers,
+      function (err, results) {
+        if (err) {
+          console.log(err);
+        }
+        console.log(results);
+        init();
+      }
+    );
+  });
+}
+
 function addRole() {
   let query = `SELECT * FROM department`;
   dbConnection.query(query, (err, results) => {
@@ -206,37 +197,18 @@ function addRole() {
     // passing depts variable into roleQuestions functions
     inquirer.prompt(roleQuestions(depts)).then((answers) => {
       dbConnection.query(
-        `INSERT INTO role (title, salary, department_id)
-        VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${answers.roleDepartment})`, function (err, results) {
-            if (err) {
-                console.log(err);
-              }
-              console.log(results);
+        `INSERT INTO role SET ?`,
+        answers,
+        function (err, results) {
+          if (err) {
+            console.log(err);
+          }
+          console.log(results);
+          init();
         }
       );
     });
   });
 }
-
-// function addRole() {
-//     viewDepartmentNames().then(answers => {
-//         console.log(answers)
-//         let departmentList = answers.map((forEachItem) => ({
-//             name: forEachItem.name,
-//             value: forEachItem.id
-//         })
-//         )
-//         console.log(departmentList)
-//     }).then(answers => {
-//         inquirer.prompt(roleQuestions).then(answers => {
-
-//             dbConnection.query(`INSERT INTO role (title, salary, department_id)
-//             VALUES (${answers.roleTitle}, ${answers.roleSalary}, ${answers.roleDepartment})`, function (err, results) {
-//                 console.log(results)
-//             })
-//         })
-//     })
-
-// }
 
 init();
