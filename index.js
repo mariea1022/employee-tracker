@@ -32,13 +32,13 @@ const inquirerMainMenuQuestions = [
 ];
 
 // function departmentQuestions() {
-  const inquirerDepartmentQuestions = [
-    {
-      type: "input",
-      message: "What is the name of the department?",
-      name: "name",
-    },
-  ];
+const inquirerDepartmentQuestions = [
+  {
+    type: "input",
+    message: "What is the name of the department?",
+    name: "name",
+  },
+];
 //   return inquirerDepartmentQuestions;
 // }
 
@@ -61,37 +61,37 @@ function roleQuestions(choicesArray) {
       choices: choicesArray,
       name: "department_id",
     },
-  ]
+  ];
   return inquirerRoleQuestions;
-};
+}
 
 function employeeQuestions(rolesChoicesArray, managersChoicesArray) {
   const inquirerEmployeeQuestions = [
-  {
-    type: "input",
-    message: "What is the employee's first name?",
-    name: "employeeFirstName",
-  },
-  {
-    type: "input",
-    message: "What is the employee's last name?",
-    name: "employeeLastName",
-  },
-  {
-    type: "list",
-    message: "What is the employee's role?",
-    choices: rolesChoicesArray,
-    name: "employeeRole",
-  },
-  {
-    type: "list",
-    message: "Who is the employee's manager?",
-    choices: managersChoicesArray,
-    name: "employeeManager",
-  },
-]
-return inquirerEmployeeQuestions
-};
+    {
+      type: "input",
+      message: "What is the employee's first name?",
+      name: "employeeFirstName",
+    },
+    {
+      type: "input",
+      message: "What is the employee's last name?",
+      name: "employeeLastName",
+    },
+    {
+      type: "list",
+      message: "What is the employee's role?",
+      choices: rolesChoicesArray,
+      name: "employeeRole",
+    },
+    {
+      type: "list",
+      message: "Who is the employee's manager?",
+      choices: managersChoicesArray,
+      name: "employeeManager",
+    },
+  ];
+  return inquirerEmployeeQuestions;
+}
 
 // function to initialize inquirer app
 function init() {
@@ -163,7 +163,7 @@ function addRole() {
     let depts = results.map((forEachItem) => ({
       name: forEachItem.name,
       value: forEachItem.id,
-    }))
+    }));
     // a console log to see what the .map creates
     console.log(depts);
     // passing depts variable into roleQuestions functions
@@ -209,33 +209,34 @@ function addEmployee() {
     let roles = results.map((forEachItem) => ({
       name: forEachItem.title,
       value: forEachItem.id,
-    }))
-    
+    }));
+
     dbConnection.query(queryTwo, (err, results) => {
       if (err) {
         console.log(err);
       }
       let managers = results.map((forEachItem) => ({
         name: forEachItem.manager_id,
-        value: forEachItem.id
-      }))
-    });
-    // a console log to see what the .map creates
-    console.log(roles)
-    console.log(managers);
-    // passing roles variable into roleQuestions functions
-  inquirer.prompt(employeeQuestions(roles, managers)).then((answers) => {
-    dbConnection.query(
-      `INSERT INTO employee SET ?`,
-      answers,
-      function (err, results) {
-        if (err) {
-          console.log(err);
-        }
-        console.log(results);
-        init();
-      }
-      );
+        value: forEachItem.id,
+      }));
+
+      // a console log to see what the .map creates
+      console.log(roles);
+      console.log(managers);
+      // passing roles variable into roleQuestions functions
+      inquirer.prompt(employeeQuestions(roles, managers)).then((answers) => {
+        dbConnection.query(
+          `INSERT INTO employee SET ?`,
+          answers,
+          function (err, results) {
+            if (err) {
+              console.log(err);
+            }
+            console.log(results);
+            init();
+          }
+        );
+      });
     });
   });
 }

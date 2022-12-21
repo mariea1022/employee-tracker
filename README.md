@@ -1,7 +1,7 @@
 # Challenge 12 SQL: Employee Tracker
 
 ## Description
-The task was to build a command-line application from scratch to manage a company's employee database, using Node.js, Inquirer, and MySQL. 
+The task was to build a command-line application from scratch to manage a company's employee database, using Node.js, Inquirer, and MySQL. This application is an interface that lets users easily view and interact with information stored in databases.
 
 ## User Story
 
@@ -12,7 +12,8 @@ SO THAT I can organize and plan my business
 ```
 
 ## Installation
-Installed Inquirer, MySQL2 and console.table as dependencies.
+Installed Inquirer to interact with the user via the command line, MySQL2 to connect my MySql database and perform queries and console.table to print MySql rows to the console.
+
 
 ## Usage
 
@@ -22,6 +23,7 @@ To use this application, follow these steps:
 
 Step 1: Enter in the command line "node server.js". <br>
 Step 2: Asnwer the prompts presented. <br>
+Step 3: When done with the application, select "I'm done" in the terminal.
 
 ## Credits
 
