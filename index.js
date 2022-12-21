@@ -67,24 +67,24 @@ function employeeQuestions(rolesChoicesArray, managersChoicesArray) {
     {
       type: "input",
       message: "What is the employee's first name?",
-      name: "employeeFirstName",
+      name: "first_name",
     },
     {
       type: "input",
       message: "What is the employee's last name?",
-      name: "employeeLastName",
+      name: "last_name",
     },
     {
       type: "list",
       message: "What is the employee's role?",
       choices: rolesChoicesArray,
-      name: "employeeRole",
+      name: "role_id",
     },
     {
       type: "list",
       message: "Who is the employee's manager?",
       choices: managersChoicesArray,
-      name: "employeeManager",
+      name: "manager_id",
     },
   ];
   return inquirerEmployeeQuestions;
@@ -120,7 +120,7 @@ function viewDepartments() {
     if (err) {
       console.log(err);
     }
-    console.log(results);
+    console.table(results);
     init();
   });
 }
@@ -134,7 +134,7 @@ function viewRoles() {
     if (err) {
       console.log(err);
     }
-    console.log(results);
+    console.table(results);
     init();
   });
 }
@@ -149,7 +149,7 @@ function viewEmployees() {
     if (err) {
       console.log(err);
     }
-    console.log(results);
+    console.table(results);
     init();
   });
 }
@@ -164,7 +164,7 @@ function addDepartment() {
         if (err) {
           console.log(err);
         }
-        console.log(results);
+        console.table(results);
         init();
       }
     );
@@ -183,7 +183,7 @@ function addRole() {
       value: forEachItem.id,
     }));
     // a console log to see what the .map creates
-    console.log(depts);
+    // console.log(depts);
     // passing depts variable into roleQuestions function
     inquirer.prompt(roleQuestions(depts)).then((answers) => {
       dbConnection.query(
@@ -193,7 +193,7 @@ function addRole() {
           if (err) {
             console.log(err);
           }
-          console.log(results);
+          console.table(results);
           init();
         }
       );
@@ -223,8 +223,8 @@ function addEmployee() {
         value: forEachItem.id,
       }));
       // a console log to see what the .map creates
-      console.log(roles);
-      console.log(managers);
+      // console.log(roles);
+      // console.log(managers);
       // passing roles and managers variables into employeeQuestions function
       inquirer.prompt(employeeQuestions(roles, managers)).then((answers) => {
         dbConnection.query(
@@ -234,7 +234,7 @@ function addEmployee() {
             if (err) {
               console.log(err);
             }
-            console.log(results);
+            console.table(results);
             init();
           }
         );
