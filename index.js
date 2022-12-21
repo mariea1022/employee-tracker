@@ -61,11 +61,12 @@ function roleQuestions(choicesArray) {
       choices: choicesArray,
       name: "department_id",
     },
-  ];
+  ]
   return inquirerRoleQuestions;
-}
+};
 
-const employeeQuestions = [
+function employeeQuestions(rolesChoicesArray, managersChoicesArray) {
+  const inquirerEmployeeQuestions = [
   {
     type: "input",
     message: "What is the employee's first name?",
@@ -79,16 +80,18 @@ const employeeQuestions = [
   {
     type: "list",
     message: "What is the employee's role?",
-    choices: [],
+    choices: rolesChoicesArray,
     name: "employeeRole",
   },
   {
     type: "list",
     message: "Who is the employee's manager?",
-    choices: [],
+    choices: managersChoicesArray,
     name: "employeeManager",
   },
-];
+]
+return inquirerEmployeeQuestions
+};
 
 // function to initialize inquirer app
 function init() {
@@ -99,12 +102,12 @@ function init() {
       viewRoles();
     } else if (answers.action == "view all employees") {
       viewEmployees();
-    } else if (answers.action = "add a department") {
+    } else if (answers.action == "add a department") {
       addDepartment();
     } else if (answers.action == "add a role") {
       addRole();
     } else if (answers.action == "add an employee") {
-    //   addEmployee();
+      addEmployee();
     } // if user selects I'm done, end the connection
     else if (answers.action == "I'm done") {
       dbConnection.end();
@@ -151,20 +154,34 @@ function viewEmployees() {
   });
 }
 
-// function viewDepartmentNames() {
-//     let depts = ""
-//     let query = `SELECT * FROM department`
-//     dbConnection.query(query, (err, results) => {
-// if (err) {
-//     console.log(err)
-// }
-// console.log(results)
-// depts = results
-// // console.log(departmentNamesArray)
-// // return departmentNamesArray
-// })
-// return depts
-// }
+function addRole() {
+  let query = `SELECT * FROM department`;
+  dbConnection.query(query, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    let depts = results.map((forEachItem) => ({
+      name: forEachItem.name,
+      value: forEachItem.id,
+    }))
+    // a console log to see what the .map creates
+    console.log(depts);
+    // passing depts variable into roleQuestions functions
+    inquirer.prompt(roleQuestions(depts)).then((answers) => {
+      dbConnection.query(
+        `INSERT INTO role SET ?`,
+        answers,
+        function (err, results) {
+          if (err) {
+            console.log(err);
+          }
+          console.log(results);
+          init();
+        }
+      );
+    });
+  });
+}
 
 function addDepartment() {
   inquirer.prompt(inquirerDepartmentQuestions).then((answers) => {
@@ -182,30 +199,42 @@ function addDepartment() {
   });
 }
 
-function addRole() {
-  let query = `SELECT * FROM department`;
+function addEmployee() {
+  let query = `SELECT * FROM role`;
+  let queryTwo = `SELECT * FROM employee`;
   dbConnection.query(query, (err, results) => {
     if (err) {
       console.log(err);
     }
-    let depts = results.map((forEachItem) => ({
-      name: forEachItem.name,
+    let roles = results.map((forEachItem) => ({
+      name: forEachItem.title,
       value: forEachItem.id,
-    }));
+    }))
+    
+    dbConnection.query(queryTwo, (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      let managers = results.map((forEachItem) => ({
+        name: forEachItem.manager_id,
+        value: forEachItem.id
+      }))
+    });
     // a console log to see what the .map creates
-    console.log(depts);
-    // passing depts variable into roleQuestions functions
-    inquirer.prompt(roleQuestions(depts)).then((answers) => {
-      dbConnection.query(
-        `INSERT INTO role SET ?`,
-        answers,
-        function (err, results) {
-          if (err) {
-            console.log(err);
-          }
-          console.log(results);
-          init();
+    console.log(roles)
+    console.log(managers);
+    // passing roles variable into roleQuestions functions
+  inquirer.prompt(employeeQuestions(roles, managers)).then((answers) => {
+    dbConnection.query(
+      `INSERT INTO employee SET ?`,
+      answers,
+      function (err, results) {
+        if (err) {
+          console.log(err);
         }
+        console.log(results);
+        init();
+      }
       );
     });
   });
