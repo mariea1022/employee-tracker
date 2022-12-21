@@ -31,7 +31,6 @@ const inquirerMainMenuQuestions = [
   },
 ];
 
-// function departmentQuestions() {
 const inquirerDepartmentQuestions = [
   {
     type: "input",
@@ -39,10 +38,8 @@ const inquirerDepartmentQuestions = [
     name: "name",
   },
 ];
-//   return inquirerDepartmentQuestions;
-// }
 
-function roleQuestions(choicesArray) {
+function roleQuestions(departmentChoicesArray) {
   const inquirerRoleQuestions = [
     {
       type: "input",
@@ -58,7 +55,7 @@ function roleQuestions(choicesArray) {
       type: "list",
       message: "Which department does this role belong to?",
       // name value pair
-      choices: choicesArray,
+      choices: departmentChoicesArray,
       name: "department_id",
     },
   ];
@@ -93,7 +90,7 @@ function employeeQuestions(rolesChoicesArray, managersChoicesArray) {
   return inquirerEmployeeQuestions;
 }
 
-// function to initialize inquirer app
+// function to initialize app
 function init() {
   inquirer.prompt(inquirerMainMenuQuestions).then((answers) => {
     if (answers.action == "view all departments") {
@@ -115,6 +112,7 @@ function init() {
   });
 }
 
+// function to view all departments in database
 function viewDepartments() {
   let query = `SELECT *
                 FROM department`;
@@ -127,6 +125,7 @@ function viewDepartments() {
   });
 }
 
+// function to view all roles in database
 function viewRoles() {
   let query = `SELECT role.title, role.id, role.salary
                 FROM role 
@@ -140,6 +139,7 @@ function viewRoles() {
   });
 }
 
+// function to view all employees in database
 function viewEmployees() {
   let query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, m.first_name as 'manager_first_name', m.last_name as 'manager_last_name' 
                 FROM employee LEFT JOIN role ON role.id = employee.role_id 
@@ -154,35 +154,7 @@ function viewEmployees() {
   });
 }
 
-function addRole() {
-  let query = `SELECT * FROM department`;
-  dbConnection.query(query, (err, results) => {
-    if (err) {
-      console.log(err);
-    }
-    let depts = results.map((forEachItem) => ({
-      name: forEachItem.name,
-      value: forEachItem.id,
-    }));
-    // a console log to see what the .map creates
-    console.log(depts);
-    // passing depts variable into roleQuestions functions
-    inquirer.prompt(roleQuestions(depts)).then((answers) => {
-      dbConnection.query(
-        `INSERT INTO role SET ?`,
-        answers,
-        function (err, results) {
-          if (err) {
-            console.log(err);
-          }
-          console.log(results);
-          init();
-        }
-      );
-    });
-  });
-}
-
+// function to add department
 function addDepartment() {
   inquirer.prompt(inquirerDepartmentQuestions).then((answers) => {
     dbConnection.query(
@@ -199,6 +171,37 @@ function addDepartment() {
   });
 }
 
+// function to add role
+function addRole() {
+  let query = `SELECT * FROM department`;
+  dbConnection.query(query, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    let depts = results.map((forEachItem) => ({
+      name: forEachItem.name,
+      value: forEachItem.id,
+    }));
+    // a console log to see what the .map creates
+    console.log(depts);
+    // passing depts variable into roleQuestions function
+    inquirer.prompt(roleQuestions(depts)).then((answers) => {
+      dbConnection.query(
+        `INSERT INTO role SET ?`,
+        answers,
+        function (err, results) {
+          if (err) {
+            console.log(err);
+          }
+          console.log(results);
+          init();
+        }
+      );
+    });
+  });
+}
+
+// function to add employee
 function addEmployee() {
   let query = `SELECT * FROM role`;
   let queryTwo = `SELECT * FROM employee`;
@@ -219,11 +222,10 @@ function addEmployee() {
         name: forEachItem.manager_id,
         value: forEachItem.id,
       }));
-
       // a console log to see what the .map creates
       console.log(roles);
       console.log(managers);
-      // passing roles variable into roleQuestions functions
+      // passing roles and managers variables into employeeQuestions function
       inquirer.prompt(employeeQuestions(roles, managers)).then((answers) => {
         dbConnection.query(
           `INSERT INTO employee SET ?`,
