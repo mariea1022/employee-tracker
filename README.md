@@ -17,7 +17,7 @@ Installed Inquirer to interact with the user via the command line, MySQL2 to con
 
 ## Usage
 
-[Here is a walkthrough video of the application.](https://)
+[Here is a walkthrough video of the application.](https://watch.screencastify.com/v/JYgslhnBhhGSqi2Y6j2i)
 
 To use this application, follow these steps:
 
