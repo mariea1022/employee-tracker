@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
 const mysql = require("mysql2");
+const consoleTable = require("console.table");
 
 // to connect to the database
 const dbConnection = mysql.createConnection(
@@ -219,7 +220,7 @@ function addEmployee() {
         console.log(err);
       }
       let managers = results.map((forEachItem) => ({
-        name: forEachItem.manager_id,
+        name: forEachItem.first_name + " " + forEachItem.last_name,
         value: forEachItem.id,
       }));
       // a console log to see what the .map creates
@@ -244,3 +245,10 @@ function addEmployee() {
 }
 
 init();
+
+// ask which employee you're updating 
+// retreiving all roles
+// take employee.id of person chosen and set the updated role to the role that was chosen
+// UPDATE table_name
+// SET column1 (role.id) = value1 (role.id they chose)
+
